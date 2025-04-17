@@ -1,8 +1,8 @@
 {
-  "name": "cdk_20250414",
+  "name": "cdk",
   "version": "0.1.0",
   "bin": {
-    "cdk_20250414": "bin/cdk_20250414.js"
+    "cdk": "bin/cdk.js"
   },
   "scripts": {
     "build": "tsc",
