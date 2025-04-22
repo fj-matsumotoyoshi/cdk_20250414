@@ -174,88 +174,88 @@ export class CDKStack extends cdk.Stack {
 
 
 
-    const myIpAddress = "MyAddress/32";
-    const allowIpv4Address = myIpAddress;
+    // const myIpAddress = "MyAddress/32";
+    // const allowIpv4Address = myIpAddress;
 
-    const ecsTaskDef = new ecs.FargateTaskDefinition(this, `${envName}-app-ecs-task-definition`);
+    // const ecsTaskDef = new ecs.FargateTaskDefinition(this, `${envName}-app-ecs-task-definition`);
 
     
-    const container = ecsTaskDef.addContainer(`${envName}-ecs-container`, {
-      image: ecs.ContainerImage.fromEcrRepository(ecrRepository),
-      readonlyRootFilesystem: true,
-      privileged: false,
-      user: '1000',
-      portMappings: [
-        {
-          containerPort: 8000,
-          protocol: ecs.Protocol.TCP,
-        },
-      ],
-      containerName: `${envName}-app`,
-      logging: ecs.LogDrivers.awsLogs({
-        streamPrefix: `${envName}-ecs-logs`,
-        logGroup: logGroup,
-      }),
-      healthCheck: {
-        command: [ "CMD-SHELL", "curl -f http://localhost:8000/ || exit 1" ],
-        interval: cdk.Duration.seconds(30),
-        retries: 2,
-        startPeriod: cdk.Duration.seconds(30),
-        timeout: cdk.Duration.seconds(30),
-      },
-    });
+    // const container = ecsTaskDef.addContainer(`${envName}-ecs-container`, {
+    //   image: ecs.ContainerImage.fromEcrRepository(ecrRepository),
+    //   readonlyRootFilesystem: true,
+    //   privileged: false,
+    //   user: '1000',
+    //   portMappings: [
+    //     {
+    //       containerPort: 8000,
+    //       protocol: ecs.Protocol.TCP,
+    //     },
+    //   ],
+    //   containerName: `${envName}-app`,
+    //   logging: ecs.LogDrivers.awsLogs({
+    //     streamPrefix: `${envName}-ecs-logs`,
+    //     logGroup: logGroup,
+    //   }),
+    //   healthCheck: {
+    //     command: [ "CMD-SHELL", "curl -f http://localhost:8000/ || exit 1" ],
+    //     interval: cdk.Duration.seconds(30),
+    //     retries: 2,
+    //     startPeriod: cdk.Duration.seconds(30),
+    //     timeout: cdk.Duration.seconds(30),
+    //   },
+    // });
     
     
-    const ecsWithALB = new ecs_patterns.ApplicationLoadBalancedFargateService(this, `${envName}-app-ecs`, {
-      serviceName: `${envName}-app-ecs`,
-      loadBalancerName: `${envName}-app-ecs-alb`,
-      cluster: cluster,
-      taskDefinition: ecsTaskDef,
-      memoryLimitMiB: 512,
-      cpu: 256,
-      ephemeralStorageGiB: 100,
-      openListener: false,
-      securityGroups: [securityGroupForApp],
-      runtimePlatform: {
-        operatingSystemFamily: ecs.OperatingSystemFamily.LINUX,
-        cpuArchitecture: ecs.CpuArchitecture.ARM64,
-      },
-      propagateTags: ecs.PropagatedTagSource.TASK_DEFINITION,
-      taskSubnets: privateAPPSubnetConfiguration,
-      deploymentController: {
-        type: ecs.DeploymentControllerType.CODE_DEPLOY,
-      },
-      desiredCount: 1,
-      listenerPort: 80,
-    });
+    // const ecsWithALB = new ecs_patterns.ApplicationLoadBalancedFargateService(this, `${envName}-app-ecs`, {
+    //   serviceName: `${envName}-app-ecs`,
+    //   loadBalancerName: `${envName}-app-ecs-alb`,
+    //   cluster: cluster,
+    //   taskDefinition: ecsTaskDef,
+    //   memoryLimitMiB: 512,
+    //   cpu: 256,
+    //   ephemeralStorageGiB: 100,
+    //   openListener: false,
+    //   securityGroups: [securityGroupForApp],
+    //   runtimePlatform: {
+    //     operatingSystemFamily: ecs.OperatingSystemFamily.LINUX,
+    //     cpuArchitecture: ecs.CpuArchitecture.ARM64,
+    //   },
+    //   propagateTags: ecs.PropagatedTagSource.TASK_DEFINITION,
+    //   taskSubnets: privateAPPSubnetConfiguration,
+    //   deploymentController: {
+    //     type: ecs.DeploymentControllerType.CODE_DEPLOY,
+    //   },
+    //   desiredCount: 1,
+    //   listenerPort: 80,
+    // });
     
 
 
    
-    // ロードバランサーの穴あけ
-    // ecsWithALB.loadBalancer.connections.allowFrom(ec2.Peer.ipv4(allowIpv4Address), ec2.Port.HTTP, 'allow inbound');
+    // // ロードバランサーの穴あけ
+    // // ecsWithALB.loadBalancer.connections.allowFrom(ec2.Peer.ipv4(allowIpv4Address), ec2.Port.HTTP, 'allow inbound');
 
-    // ALBのアクセスログを有効化
-    ecsWithALB.loadBalancer.logAccessLogs(logBucket, 'ecs-alb-access-logs');
+    // // ALBのアクセスログを有効化
+    // ecsWithALB.loadBalancer.logAccessLogs(logBucket, 'ecs-alb-access-logs');
 
     
     
 
-    const scalableTarget = ecsWithALB.service.autoScaleTaskCount({
-      maxCapacity: 2,
-      minCapacity: 1
-    });
-    scalableTarget.scaleOnCpuUtilization('CPUScaling', {
-      targetUtilizationPercent: 50
-    });
-    scalableTarget.scaleOnMemoryUtilization('MemoryScaling', {
-      targetUtilizationPercent: 50
-    });
+    // const scalableTarget = ecsWithALB.service.autoScaleTaskCount({
+    //   maxCapacity: 2,
+    //   minCapacity: 1
+    // });
+    // scalableTarget.scaleOnCpuUtilization('CPUScaling', {
+    //   targetUtilizationPercent: 50
+    // });
+    // scalableTarget.scaleOnMemoryUtilization('MemoryScaling', {
+    //   targetUtilizationPercent: 50
+    // });
 
-    ecsWithALB.service.connections.allowFrom(
-      ecsWithALB.loadBalancer,
-      ec2.Port.tcp(8000),
-    );
+    // ecsWithALB.service.connections.allowFrom(
+    //   ecsWithALB.loadBalancer,
+    //   ec2.Port.tcp(8000),
+    // );
 
     
 

@@ -13,7 +13,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest sample-nginx
+      - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
@@ -24,7 +24,4 @@ phases:
       - echo Writing image definitions file...
       - printf '[{"name":"ecsAutoDeployRepo","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
 artifacts:
-  base-directory: sample-nginx
-
-
   files: imagedefinitions.json
