@@ -26,9 +26,9 @@ export class CDKStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const envName = "mlda-sandbox-matsuy";
+    const envName = "mlda-sand-matsuy";
 
-    
+
     //CloudWatch Logs
     
     const logGroup = new logs.LogGroup(this, `${envName}-loggroup-for-app-task`, {
@@ -179,7 +179,7 @@ export class CDKStack extends cdk.Stack {
 
     const ecsTaskDef = new ecs.FargateTaskDefinition(this, `${envName}-app-ecs-task-definition`);
 
-    // 2. まずコンテナを追加する
+    
     const container = ecsTaskDef.addContainer(`${envName}-ecs-container`, {
       image: ecs.ContainerImage.fromEcrRepository(ecrRepository),
       readonlyRootFilesystem: true,
@@ -205,7 +205,7 @@ export class CDKStack extends cdk.Stack {
       },
     });
     
-    // 3. そのあとに ALB付きFargateサービスを定義
+    
     const ecsWithALB = new ecs_patterns.ApplicationLoadBalancedFargateService(this, `${envName}-app-ecs`, {
       serviceName: `${envName}-app-ecs`,
       loadBalancerName: `${envName}-app-ecs-alb`,
